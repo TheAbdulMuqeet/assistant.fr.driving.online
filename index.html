@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+            transition-duration: 200ms;
+        }
+
+        html {
+            font-size: 14px;
+        }
+
+        main {
+            justify-content: center;
+            align-items: center;
+            background-color: #0f0122;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        @media screen and (min-width: 1920px) {
+            #chatbox {
+                max-width: 50rem;
+            }
+
+            html {
+                font-size: 20px;
+            }
+        }
+
+        @media screen and (min-width: 2500px) {
+            #chatbox {
+                max-width: 70rem;
+            }
+
+            html {
+                font-size: 28px;
+            }
+        }
+
+        #gpt-message,
+        #input-area,
+        #choices button,
+        #send_text {
+            border-radius: 7px;
+        }
+
+        #chatbox {
+            flex-direction: column;
+            margin: 1rem;
+            height: 100%;
+            width: 100%;
+            border-radius: 15px;
+            max-height: 90%;
+            max-width: 40rem;
+            padding: 20px;
+            background: linear-gradient(169deg, #f96031 10%, #8a128e 31%, #704ee8 58%, #170e44 91%);
+            position: relative;
+            box-shadow: 0px 2px 18px 0px #fc7d23;
+        }
+
+        #chatbox * {
+            z-index: 3;
+        }
+
+        #chatbox>h2 {
+            text-align: center;
+            color: white;
+            font-size: 2em;
+            margin-bottom: 1rem;
+            font-weight: bolder;
+        }
+
+        #blob {
+            width: 20rem;
+            height: 20rem;
+            z-index: 2;
+            position: absolute;
+            bottom: 5%;
+            right: 3%;
+            animation: blob 10s infinite alternate;
+            background: linear-gradient(169deg, #170e44 10%, #704ee8 31%, #8a128e 58%, #f96031 91%);
+        }
+
+        @keyframes blob {
+            0% {
+                border-radius: 171% 93% 102% 78%;
+                transform: rotateZ(0deg);
+            }
+
+            20% {
+                border-radius: 233% 117% 75% 116%;
+            }
+
+            60% {
+                border-radius: 91% 156% 85% 87%;
+            }
+
+            80% {
+                border-radius: 49% 132% 127% 117%;
+            }
+
+            100% {
+                border-radius: 171% 93% 102% 78%;
+                transform: rotateZ(20deg);
+            }
+        }
+
+        #gpt-message {
+            height: 40%;
+            background-color: white;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        #load {
+            background-color: #ffffff;
+            position: absolute;
+            box-shadow: 0 10px 30px #00000070;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            filter: opacity(0);
+            padding: 5px 20px;
+            border-radius: 20px;
+        }
+
+        #load span {
+            margin: 0 0.1rem;
+            animation: blink 0.5s infinite alternate;
+        }
+
+        #load span:nth-child(1) {
+            animation-delay: 0ms;
+        }
+
+        #load span:nth-child(2) {
+            animation-delay: 200ms;
+        }
+
+        #load span:nth-child(3) {
+            animation-delay: 400ms;
+        }
+
+        #gpt-message>p {
+            color: black !important;
+            font-size: 1.3em;
+        }
+
+        @keyframes blink {
+            0% {
+                filter: opacity(0);
+            }
+
+            100% {
+                filter: opacity(1);
+            }
+        }
+
+        #user-input {
+            height: 60%;
+            justify-content: space-between;
+            flex-direction: column;
+        }
+
+        #user-input * {
+            color: white;
+        }
+
+        #user-input h3,
+        #choice-box h3 {
+            height: 10%;
+            margin: 1rem 0;
+        }
+
+        #input-box {
+            height: 70%;
+            flex-direction: column;
+        }
+
+        #input-box div {
+            align-items: end;
+            height: 100%;
+        }
+
+        #input-area {
+            background-color: #00000069;
+            --webkit-backdrop-filter: blur(0px);
+            backdrop-filter: blur(0px);
+            width: 100%;
+            height: 100%;
+            min-height: 10rem;
+            padding: 10px;
+            outline: none;
+            border: 2px solid #8a8a8a;
+            font-size: 1em;
+        }
+
+        ::placeholder {
+            color: #c3c3c3 !important;
+        }
+
+        #input-area:focus {
+            border-color: white;
+            --webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            font-size: 1.3em;
+        }
+
+        #choices {
+            height: 90%;
+            list-style-type: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #choices button {
+            margin-top: 1rem;
+            padding: 10px 30px;
+            background-color: white;
+            border: 1px solid white;
+            box-shadow: 0px 2px 18px 0px #f96031;
+            color: #f416a3;
+            outline: none;
+            font-weight: 800;
+            font-size: 0.9em;
+
+            --webkit-backdrop-filter: blur(0px);
+            backdrop-filter: blur(0px);
+        }
+
+        #choices button:hover {
+            background-color: #00000058;
+            color: white;
+            --webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+        }
+
+        #choices button:active {
+            background-color: white;
+            color: black;
+        }
+
+        #choice-box {
+            height: 30%;
+            flex-direction: column;
+        }
+
+        #send_text {
+            background: linear-gradient(-45deg, #52eead, #3c86e7, #5523d5, #a223d5);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            margin: 0 0 0 0.5rem;
+            min-width: 40px;
+            height: 30px;
+            outline: none;
+            border: none;
+        }
+
+        #send_text:hover {
+            background: white;
+        }
+
+        #send_text:hover i {
+            color: black;
+        }
+
+        #send_text:active {
+            background: black;
+        }
+
+        #send_text:active i {
+            color: white;
+        }
+
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        #send_text i {
+            color: white;
+            font-size: 1.8em;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="flex">
+        <div id="chatbox" class="flex">
+            <div id="blob">
+
+            </div>
+            <div id="load">
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+            </div>
+            <h2>Driving Online</h2>
+            <section id="gpt-message">
+                <p>Tapez "start" dans la zone de saisie pour démarrer le quiz</p>
+            </section>
+            <section id="user-input" class="flex">
+                <div id="input-box" class="flex">
+                    <h3>Saisissez votre texte ici</h3>
+                    <div class="flex">
+                        <textarea name="input-area" id="input-area"
+                            placeholder="Veuillez saisir votre texte ici"></textarea>
+                        <button id="send_text">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="choice-box" class="flex">
+                    <h3>Réponse instantanée</h3>
+                    <ul id="choices" class="flex">
+                        <li>
+                            <button class="choice" id="choice-1">
+                                A
+                            </button>
+                        </li>
+                        <li>
+                            <button class="choice" id="choice-2">
+                                B
+                            </button>
+                        </li>
+                        <li>
+                            <button class="choice" id="choice-3">
+                                C
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        let send_btn = document.querySelector('#send_text');
+        let input_area = document.querySelector('#input-area');
+        let gpt_area = document.querySelector('#gpt-message>p');
+        let wait = document.querySelector('#load');
+        let text = '';
+        let userText = '';
+
+        let i = 0;
+        var speed = 20;
+
+
+        const scrollSmoothlyToBottom = (id) => {
+            const element = $(`#${id}`);
+            element.animate({
+                scrollTop: element.prop("scrollHeight")
+            }, 500);
+        }
+
+
+        function typeWriter() {
+            if (i < text.length) {
+                gpt_area.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+                gpt_area.scrollTop = gpt_area.scrollHeight;
+            }
+        }
+
+        $(function () {
+            $('#send_text').click(function (e) {
+                if (input_area.value != '') {
+                    wait.style.filter = 'opacity(1)';
+                    gpt_area.innerHTML += '<br>';
+                    userText = input_area.value;
+                    input_area.value = '';
+                    e.preventDefault();
+
+                    $.ajax({
+                        type: 'POST',
+                        data: JSON.stringify({ "userInput": userText }),
+                        contentType: 'application/json',
+                        url: '/endpoint',
+                        success: function (data) {
+                            text = JSON.stringify(data);
+                            wait.style.filter = 'opacity(0)';
+                            i = 0
+                            typeWriter();
+                        }
+                    });
+                }
+            });
+        });
+
+        $(function () {
+            $('#choice-1').click(send_req_btn)
+        })
+        $(function () {
+            $('#choice-2').click(send_req_btn)
+        })
+        $(function () {
+            $('#choice-3').click(send_req_btn)
+        })
+
+        function send_req_btn() {
+            document.querySelectorAll('.choice').forEach((elem) => {
+                elem.disabled = true;
+            });
+
+            gpt_area.innerHTML += '<br>';
+            wait.style.filter = 'opacity(1)';
+            userText = this.innerHTML.trim();
+
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify({ "userInput": userText }),
+                contentType: 'application/json',
+                url: '/endpoint',
+                success: function (data) {
+                    text = JSON.stringify(data);
+                    wait.style.filter = 'opacity(0)';
+                    i = 0
+                    typeWriter();
+                    document.querySelectorAll('.choice').forEach((elem) => {
+                        elem.disabled = false;
+                    });
+                }
+            });
+
+        }
+
+
+    </script>
+</body>
+
+</html>
